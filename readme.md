@@ -37,10 +37,10 @@ deemed to have failed.
 | Test           | Passed | Timeout | Failed |
 |:---------------|:-------|:--------|:-------|
 | Haskell HOAS   | 3466   | 0       | 0      |
-| Optiscope      | 3301   | 165     | 0      |
+| Optiscope      | 3450   | 16      | 0      |
 | Tromp AIT/nf.c | 1935   | 5       | 1526   |
 | Your project   | ?      | ?       | ?      |
 
 ### Effects
 
-- improved optiscope: https://github.com/etiamz/optiscope/issues/5, https://github.com/etiamz/optiscope/issues/6
+- improved optiscope: https://github.com/etiamz/optiscope/issues/5, https://github.com/etiamz/optiscope/issues/6, https://github.com/etiamz/optiscope/issues/7
