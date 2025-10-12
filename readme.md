@@ -37,7 +37,7 @@ deemed to have failed.
 | Test           | Passed | Timeout | Failed |
 |:---------------|:-------|:--------|:-------|
 | Haskell HOAS   | 3466   | 0       | 0      |
-| Optiscope      | 3301   | 15      | 0      |
+| Optiscope      | 3450   | 16      | 0      |
 | Tromp AIT/nf.c | 1935   | 5       | 1526   |
 | Your project   | ?      | ?       | ?      |
 
