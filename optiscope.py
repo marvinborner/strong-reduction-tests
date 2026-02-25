@@ -192,6 +192,7 @@ def runRange(start, end):
             "cc",
             f"optiscopeTests{start}.c",
             "optiscope/optiscope.c",
+            "-Ioptiscope",
             "-o",
             f"optiscopeTests{start}.out",
         ]
