@@ -38,6 +38,7 @@ deemed to have failed.
 |:---------------|:-------|:--------|:-------|
 | Haskell HOAS   | 3466   | 0       | 0      |
 | Optiscope      | 3465   | 1       | 0      |
+| Freya-lang     | 3320   | 1       | 145    |
 | Tromp AIT/nf.c | 1935   | 5       | 1526   |
 | Your project   | ?      | ?       | ?      |
 
