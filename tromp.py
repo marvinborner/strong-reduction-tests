@@ -2,24 +2,23 @@
 
 import subprocess
 
-subprocess.run(["cc", "AIT/nf.c"])
+subprocess.run(["cc", "-O2", "AIT/nf.c"])
 
 TESTS = open("tests").readlines()
 TIMEOUT = 5  # seconds
 
 
 def toBLC(term):
-    if term == "":
-        return term
-
-    if term[0] == "\\":
-        res = "00"
-    elif term[0] == "`":
-        res = "01"
-    else:
-        idx = int(term[0]) + 1
-        res = "1" * idx + "0"
-    return res + toBLC(term[1:])
+    res = []
+    for c in term:
+        if c == "\\":
+            res.append("00")
+        elif c == "`":
+            res.append("01")
+        else:
+            idx = ord(c) - ord("0") + 1
+            res.append("1" * idx + "0")
+    return "".join(res)
 
 
 def reduce(term):
