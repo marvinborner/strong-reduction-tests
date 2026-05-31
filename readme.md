@@ -35,13 +35,16 @@ reaching a normal form is deemed to have not passed.
 
 ### Results
 
-| Test           | Passed | Timeout | Failed |
-|:---------------|:-------|:--------|:-------|
-| Haskell HOAS   | 1197   | 0       | 0      |
-| Tromp AIT/nf.c | 1197   | 0       | 0      |
-| Optiscope      | 1196   | 1       | 0      |
-| Freya-lang     | 1095   | 15      | 87     |
-| Your project   | ?      | ?       | ?      |
+| Test              | Passed | Timeout | Failed |
+|:------------------|:-------|:--------|:-------|
+| Haskell HOAS      | 1197   | 0       | 0      |
+| Tromp AIT/nf.c    | 1197   | 0       | 0      |
+| Optiscope         | 1196   | 1       | 0      |
+| Freya-lang        | 1095   | 15      | 87     |
+| Rebound ShiftList | 1104   | 93      | 0      |
+| Rebound Lazy      | 1093   | 104     | 0      |
+| Rebound SkewList  | 1085   | 112     | 0      |
+| Your project      | ?      | ?       | ?      |
 
 META 1:
 
@@ -52,7 +55,7 @@ runhaskell haskell.hs
 ./tromp.py
 ./optiscope.py
 ./freya.py
-runhaskell rebound.hs
+stack --stack-yaml rebound/benchmark/stack.yaml runghc rebound.hs
 ```
 
 ### Effects

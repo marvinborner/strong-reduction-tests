@@ -4,3 +4,6 @@
 [submodule "AIT"]
 	path = AIT
 	url = https://github.com/tromp/AIT.git
+[submodule "rebound"]
+	path = rebound
+	url = https://github.com/sweirich/rebound
