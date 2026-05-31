@@ -4,17 +4,12 @@ import subprocess
 
 from blc import eta_equivalent, read_tests, tromp_output_to_blc
 
-
 TIMEOUT = 5
-
-
-def compile_normalizer():
-    subprocess.run(["cc", "-O2", "nf.c"], check=True)
 
 
 def reduce(term):
     proc = subprocess.Popen(
-        ["./a.out", "-b"],
+        ["./a.out", "-bx"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
@@ -32,33 +27,27 @@ def reduce(term):
     return tromp_output_to_blc(stdout.decode("utf-8").strip())
 
 
-def main():
-    compile_normalizer()
+subprocess.run(["cc", "-fsplit-stack", "-O2", "nf.c"], check=True)
 
-    passed = []
-    timeout = []
-    failed = []
+passed = []
+timeout = []
+failed = []
 
-    for test in read_tests():
-        try:
-            normal = reduce(test.source)
-            if eta_equivalent(normal, test.normal):
-                passed.append(test.label)
-            else:
-                print(f"failed! Got {normal}, expected {test.normal}")
-                failed.append(test.label)
-        except TimeoutError:
-            print("timeout!")
-            timeout.append(test.label)
-        except Exception as exc:
-            print(f"exception! {exc}")
+for test in read_tests():
+    try:
+        normal = reduce(test.source)
+        if eta_equivalent(normal, test.normal):
+            passed.append(test.label)
+        else:
+            print(f"failed! Got {normal}, expected {test.normal}")
             failed.append(test.label)
+    except TimeoutError:
+        print("timeout!")
+        timeout.append(test.label)
+    except Exception as exc:
+        print(f"exception! {exc}")
+        failed.append(test.label)
 
-    print("passed:", len(passed))
-    print("timeout:", len(timeout))
-    print("failed:", len(failed))
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+print("passed:", len(passed))
+print("timeout:", len(timeout))
+print("failed:", len(failed))

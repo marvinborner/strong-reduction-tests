@@ -46,7 +46,18 @@ reaching a normal form is deemed to have not passed.
 | Rebound SkewList  | 1085   | 112     | 0      |
 | Your project      | ?      | ?       | ?      |
 
-META 1:
+`uni.blc` tower of 1:
+
+| Test              | Passed | Timeout | Failed |
+|:------------------|:-------|:--------|:-------|
+| Haskell HOAS      | 1197   | 0       | 0      |
+| Tromp AIT/nf.c    | 1170   | 27      | 0      |
+| Freya-lang        | 90     | 209     | 898    |
+| Optiscope         | ?      | ?       | ?      |
+| Rebound ShiftList | ?      | ?       | ?      |
+| Rebound Lazy      | ?      | ?       | ?      |
+| Rebound SkewList  | ?      | ?       | ?      |
+| Your project      | ?      | ?       | ?      |
 
 ### Reproduction
 
@@ -56,6 +67,12 @@ runhaskell haskell.hs
 ./optiscope.py
 ./freya.py
 stack --stack-yaml rebound/benchmark/stack.yaml runghc rebound.hs
+```
+
+for interpreter towers of size $n$:
+
+``` bash
+./towerify n > tests
 ```
 
 ### Effects

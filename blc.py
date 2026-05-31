@@ -2,7 +2,6 @@ import re
 import sys
 from pathlib import Path
 
-ANSI_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 TEST_RE = re.compile(
     r"^(?P<label>.*):\s*(?P<source>[01]+)\s+-\s*(?P<normal>[01]+)\s*$"
 )
@@ -79,8 +78,6 @@ def ensure_recursion_limit(limit=1_000_000):
 
 
 def parse_blc(bits):
-    if not re.fullmatch(r"[01]+", bits):
-        raise BlcError("BLC input must contain only 0 and 1")
     return Parser(bits).parse()
 
 
@@ -104,12 +101,8 @@ def tromp_output_to_blc(term):
     return "".join(bits)
 
 
-def strip_ansi(text):
-    return ANSI_RE.sub("", text)
-
-
 def read_test_line(line):
-    line = strip_ansi(line).strip()
+    line = line.strip()
     if not line:
         return None
 
