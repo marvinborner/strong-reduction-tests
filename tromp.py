@@ -27,7 +27,7 @@ def reduce(term):
     return tromp_output_to_blc(stdout.decode("utf-8").strip())
 
 
-subprocess.run(["cc", "-fsplit-stack", "-O2", "nf.c"], check=True)
+subprocess.run(["cc", "-fsplit-stack", "-O2", "AIT/nf.c"], check=True)
 
 passed = []
 timeout = []

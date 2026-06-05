@@ -131,15 +131,46 @@ def read_tests(path="tests"):
 
 
 def blc_to_freya(bits):
-    return render_freya(parse_blc(bits))
+    return render_named_lambda(parse_blc(bits), "freya")
+
+
+def blc_to_hvm1(bits):
+    return render_hvm1(parse_blc(bits))
+
+
+def blc_to_hvm3(bits):
+    return render_hvm3(parse_blc(bits))
+
+
+def blc_to_hvm4(bits):
+    return render_hvm4(parse_blc(bits))
 
 
 def blc_to_optiscope_lambda(bits):
     return render_optiscope_lambda(parse_blc(bits))
 
 
-def render_freya(term):
+def render_hvm1(term):
+    return render_named_lambda(term, "hvm1")
+
+
+def render_hvm3(term):
+    return render_named_lambda(term, "hvm3")
+
+
+def render_hvm4(term):
+    return render_named_lambda(term, "hvm4")
+
+
+def render_named_lambda(term, target):
     env = []
+
+    def binder_uses(term, depth=0):
+        if isinstance(term, Var):
+            return int(term.index == depth)
+        if isinstance(term, Abs):
+            return binder_uses(term.body, depth + 1)
+        return binder_uses(term.func, depth) + binder_uses(term.arg, depth)
 
     def go(term):
         if isinstance(term, Var):
@@ -149,12 +180,36 @@ def render_freya(term):
 
         if isinstance(term, Abs):
             name = f"x{len(env)}"
+            clone = target in ("hvm3", "hvm4") and binder_uses(term.body) > 1
+            binder = f"&{name}" if clone else name
             env.append(name)
             body = go(term.body)
             env.pop()
-            return f"(!{name} {body})"
+            if target == "freya":
+                return f"(!{binder} {body})"
+            if target == "hvm1":
+                return f"@{binder} {body}"
+            if target == "hvm3":
+                return f"λ{binder} {body}"
+            return f"λ{binder}.{body}"
 
+        if target == "hvm4":
+            func, args = flatten_app(term)
+            return f"{atom(func)}({','.join(go(arg) for arg in args)})"
         return f"({go(term.func)} {go(term.arg)})"
+
+    def flatten_app(term):
+        args = []
+        while isinstance(term, App):
+            args.append(term.arg)
+            term = term.func
+        args.reverse()
+        return term, args
+
+    def atom(term):
+        if isinstance(term, Var):
+            return go(term)
+        return f"({go(term)})"
 
     return go(term)
 
@@ -165,6 +220,137 @@ def render_optiscope_lambda(term):
     if isinstance(term, Abs):
         return f"(λ {render_optiscope_lambda(term.body)})"
     return f"({render_optiscope_lambda(term.func)} {render_optiscope_lambda(term.arg)})"
+
+
+def hvm1_output_to_blc(text):
+    return to_blc(parse_hvm_spaced(text.strip()))
+
+
+def hvm3_output_to_blc(text):
+    return hvm1_output_to_blc(first_output_line(text))
+
+
+def hvm4_output_to_blc(text):
+    return to_blc(parse_hvm_call(first_output_line(text)))
+
+
+def first_output_line(text):
+    return next(line.strip() for line in text.splitlines() if line.strip())
+
+
+def parse_hvm_spaced(text):
+    pos = 0
+    env = []
+
+    def space():
+        nonlocal pos
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+
+    def name():
+        nonlocal pos
+        space()
+        start = pos
+        while (
+            pos < len(text)
+            and not text[pos].isspace()
+            and text[pos] not in "(){};"
+        ):
+            pos += 1
+        return text[start:pos]
+
+    def term():
+        nonlocal pos
+        space()
+        if text[pos] == "(":
+            pos += 1
+            app = term()
+            while True:
+                space()
+                if text[pos] == ")":
+                    pos += 1
+                    return app
+                app = App(app, term())
+        if text[pos] in "@λ":
+            pos += 1
+            var = name().lstrip("&")
+            env.append(var)
+            body = term()
+            env.pop()
+            return Abs(body)
+        var = name()
+        return Var(bound_index(env, var))
+
+    return term()
+
+
+def parse_hvm_call(text):
+    pos = 0
+    env = []
+
+    def space():
+        nonlocal pos
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+
+    def name():
+        nonlocal pos
+        space()
+        start = pos
+        while (
+            pos < len(text)
+            and not text[pos].isspace()
+            and text[pos] not in "().,{};"
+        ):
+            pos += 1
+        return text[start:pos]
+
+    def term():
+        nonlocal pos
+        space()
+        if text[pos] == "λ":
+            pos += 1
+            var = name().lstrip("&")
+            space()
+            if text[pos] == ".":
+                pos += 1
+            env.append(var)
+            body = term()
+            env.pop()
+            return Abs(body)
+
+        app = atom()
+        space()
+        while pos < len(text) and text[pos] == "(":
+            pos += 1
+            while True:
+                app = App(app, term())
+                space()
+                if text[pos] == ")":
+                    pos += 1
+                    break
+                if text[pos] == ",":
+                    pos += 1
+            space()
+        return app
+
+    def atom():
+        nonlocal pos
+        space()
+        if text[pos] == "(":
+            pos += 1
+            value = term()
+            space()
+            pos += 1
+            return value
+        var = name()
+        return Var(bound_index(env, var))
+
+    return term()
+
+
+def bound_index(env, name):
+    return list(reversed(env)).index(name)
 
 
 def eta_equivalent(a, b):

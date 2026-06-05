@@ -40,11 +40,22 @@ reaching a normal form is deemed to have not passed.
 | Haskell HOAS      | 1197   | 0       | 0      |
 | Tromp AIT/nf.c    | 1197   | 0       | 0      |
 | Optiscope         | 1196   | 1       | 0      |
-| Freya-lang        | 1095   | 15      | 87     |
+| HVM4              | 1122   | 7       | 69     |
+| HVM3              | 1122   | 73      | 2      |
 | Rebound ShiftList | 1104   | 93      | 0      |
+| Freya-lang        | 1095   | 15      | 87     |
 | Rebound Lazy      | 1093   | 104     | 0      |
 | Rebound SkewList  | 1085   | 112     | 0      |
+| HVM1              | 930    | 266     | 1      |
 | Your project      | ?      | ?       | ?      |
+
+EAL tests:
+
+| Test | Passed | Timeout | Failed |
+|:-----|:-------|:--------|:-------|
+| HVM1 | 532    | 0       | 0      |
+| HVM3 | 532    | 0       | 0      |
+| HVM4 | 532    | 0       | 0      |
 
 `uni.blc` tower of 1:
 
@@ -57,6 +68,9 @@ reaching a normal form is deemed to have not passed.
 | Rebound ShiftList | ?      | ?       | ?      |
 | Rebound Lazy      | ?      | ?       | ?      |
 | Rebound SkewList  | ?      | ?       | ?      |
+| HVM1              | ?      | ?       | ?      |
+| HVM3              | ?      | ?       | ?      |
+| HVM4              | ?      | ?       | ?      |
 | Your project      | ?      | ?       | ?      |
 
 ### Reproduction
