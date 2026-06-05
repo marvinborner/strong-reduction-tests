@@ -7,3 +7,15 @@
 [submodule "rebound"]
 	path = rebound
 	url = https://github.com/sweirich/rebound
+[submodule "hvm1"]
+	path = hvm1
+	url = https://github.com/higherOrderCO/hvm1
+[submodule "hvm2"]
+	path = hvm2
+	url = https://github.com/higherOrderCO/hvm2
+[submodule "hvm3"]
+	path = hvm3
+	url = https://github.com/higherOrderCO/hvm3
+[submodule "hvm4"]
+	path = hvm4
+	url = https://github.com/higherOrderCO/hvm4
