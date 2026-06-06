@@ -135,31 +135,19 @@ def blc_to_freya(bits):
 
 
 def blc_to_hvm1(bits):
-    return render_hvm1(parse_blc(bits))
+    return render_named_lambda(parse_blc(bits), "hvm1")
 
 
 def blc_to_hvm3(bits):
-    return render_hvm3(parse_blc(bits))
+    return render_named_lambda(parse_blc(bits), "hvm3")
 
 
 def blc_to_hvm4(bits):
-    return render_hvm4(parse_blc(bits))
+    return render_named_lambda(parse_blc(bits), "hvm4")
 
 
 def blc_to_optiscope_lambda(bits):
     return render_optiscope_lambda(parse_blc(bits))
-
-
-def render_hvm1(term):
-    return render_named_lambda(term, "hvm1")
-
-
-def render_hvm3(term):
-    return render_named_lambda(term, "hvm3")
-
-
-def render_hvm4(term):
-    return render_named_lambda(term, "hvm4")
 
 
 def render_named_lambda(term, target):
@@ -223,24 +211,25 @@ def render_optiscope_lambda(term):
 
 
 def hvm1_output_to_blc(text):
-    return to_blc(parse_hvm_spaced(text.strip()))
+    return to_blc(parse_named_lambda(text.strip()))
 
 
 def hvm3_output_to_blc(text):
-    return hvm1_output_to_blc(first_output_line(text))
+    return to_blc(parse_named_lambda(first_output_line(text)))
 
 
 def hvm4_output_to_blc(text):
-    return to_blc(parse_hvm_call(first_output_line(text)))
+    return to_blc(parse_named_lambda(first_output_line(text), calls=True))
 
 
 def first_output_line(text):
     return next(line.strip() for line in text.splitlines() if line.strip())
 
 
-def parse_hvm_spaced(text):
+def parse_named_lambda(text, calls=False):
     pos = 0
     env = []
+    stops = "().,{};" if calls else "(){};"
 
     def space():
         nonlocal pos
@@ -254,7 +243,7 @@ def parse_hvm_spaced(text):
         while (
             pos < len(text)
             and not text[pos].isspace()
-            and text[pos] not in "(){};"
+            and text[pos] not in stops
         ):
             pos += 1
         return text[start:pos]
@@ -262,64 +251,39 @@ def parse_hvm_spaced(text):
     def term():
         nonlocal pos
         space()
-        if text[pos] == "(":
-            pos += 1
-            app = term()
-            while True:
-                space()
-                if text[pos] == ")":
-                    pos += 1
-                    return app
-                app = App(app, term())
         if text[pos] in "@λ":
-            pos += 1
-            var = name().lstrip("&")
-            env.append(var)
-            body = term()
-            env.pop()
-            return Abs(body)
-        var = name()
-        return Var(bound_index(env, var))
+            return lambda_()
 
-    return term()
+        app = parened() if text[pos] == "(" else Var(bound_index(env, name()))
+        if calls:
+            return call_chain(app)
+        return app
 
-
-def parse_hvm_call(text):
-    pos = 0
-    env = []
-
-    def space():
+    def lambda_():
         nonlocal pos
-        while pos < len(text) and text[pos].isspace():
-            pos += 1
-
-    def name():
-        nonlocal pos
+        pos += 1
+        var = name().lstrip("&")
         space()
-        start = pos
-        while (
-            pos < len(text)
-            and not text[pos].isspace()
-            and text[pos] not in "().,{};"
-        ):
+        if calls and text[pos] == ".":
             pos += 1
-        return text[start:pos]
+        env.append(var)
+        body = term()
+        env.pop()
+        return Abs(body)
 
-    def term():
+    def parened():
         nonlocal pos
+        pos += 1
+        app = term()
         space()
-        if text[pos] == "λ":
-            pos += 1
-            var = name().lstrip("&")
+        while not calls and text[pos] != ")":
+            app = App(app, term())
             space()
-            if text[pos] == ".":
-                pos += 1
-            env.append(var)
-            body = term()
-            env.pop()
-            return Abs(body)
+        pos += 1
+        return app
 
-        app = atom()
+    def call_chain(app):
+        nonlocal pos
         space()
         while pos < len(text) and text[pos] == "(":
             pos += 1
@@ -333,18 +297,6 @@ def parse_hvm_call(text):
                     pos += 1
             space()
         return app
-
-    def atom():
-        nonlocal pos
-        space()
-        if text[pos] == "(":
-            pos += 1
-            value = term()
-            space()
-            pos += 1
-            return value
-        var = name()
-        return Var(bound_index(env, var))
 
     return term()
 
