@@ -49,13 +49,16 @@ reaching a normal form is deemed to have not passed.
 | HVM1              | 930    | 266     | 1      |
 | Your project      | ?      | ?       | ?      |
 
-EAL tests:
+EAL tests (subset typable in elementary affine logic, smaller than
+abstract, bookkeeping-free subset of optimal reduction):
 
-| Test | Passed | Timeout | Failed |
-|:-----|:-------|:--------|:-------|
-| HVM1 | 532    | 0       | 0      |
-| HVM3 | 532    | 0       | 0      |
-| HVM4 | 532    | 0       | 0      |
+| Test       | Passed | Timeout | Failed |
+|:-----------|:-------|:--------|:-------|
+| HVM1       | 532    | 0       | 0      |
+| HVM3       | 532    | 0       | 0      |
+| HVM4       | 532    | 0       | 0      |
+| optiscope  | 532    | 0       | 0      |
+| freya-lang | 532    | 0       | 0      |
 
 `uni.blc` tower of 1:
 
@@ -81,6 +84,9 @@ runhaskell haskell.hs
 ./optiscope.py
 ./freya.py
 stack --stack-yaml rebound/benchmark/stack.yaml runghc rebound.hs
+./hvm1.py
+./hvm3.py
+./hvm4.py
 ```
 
 for interpreter towers of size $n$:
